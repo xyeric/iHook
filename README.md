@@ -14,7 +14,7 @@ iHookÖ»ÄÜÔÚ×ÔÉíÔËÐÐµÄ½ø³ÌÖÐÉèÖÃHook£¬Èç¹ûÐèÒª¿ç½ø³ÌÖ´ÐÐ£¬¿ÉÒÔ½«²Ù×÷½çÃæ·â×°³ÉÒ»¸
 
 ¸ÃÏîÄ¿ÖÐ°üº¬Èý¸öÄ¿Â¼£¬·Ö±ðÊÇ£º
 - iHook £¬HookºËÐÄ´úÂë£¬Ìá¹©Hook²Ù×÷½Ó¿Ú¡£
-- Samples£¬Ê¾Àý´úÂë
+- Samples£¬Ê¾Àý´úÂë¡£
 
 ### ±àÒë°²×°
 
