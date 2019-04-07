@@ -1,7 +1,7 @@
 #include "assert.h"
 #include "tchar.h"
 #include "udis86.h"
-#include "hook.h"
+#include "iHook.h"
 
 #define HOOK_DELEGATE_BUFFER_SIZE 0x3B
 #define HOOK_DELEGATE_CALLBACK_PARAM_PTR_OFFSET 0x02

@@ -48,7 +48,7 @@
     <ClInclude Include="udis86.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="hook.h">
+    <ClInclude Include="iHook.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -74,7 +74,7 @@
     <ClCompile Include="libudis86\udis86.c">
       <Filter>源文件\libudis86</Filter>
     </ClCompile>
-    <ClCompile Include="hook.cpp">
+    <ClCompile Include="iHook.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
