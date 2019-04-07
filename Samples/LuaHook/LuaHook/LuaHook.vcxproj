@@ -222,7 +222,7 @@
     <ResourceCompile Include="LuaHook.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hook\Hook.vcxproj">
+    <ProjectReference Include="..\..\..\iHook\iHook.vcxproj">
       <Project>{4014a566-d2b7-4ff2-b567-fa3dfcde2fe8}</Project>
     </ProjectReference>
   </ItemGroup>

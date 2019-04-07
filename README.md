@@ -1,6 +1,6 @@
 ## iHook
 
-WindowsÆ½Ì¨ÏÂµÄHook²Ù×÷¿â£¬¿ÉÒÔ¿ç½ø³Ì¶ÁÈ¡Ä¿±ê½ø³ÌÔËÐÐ¹ý³ÌÖÐ´úÂë¶ÎÈÎÒâÎ»ÖÃµÄ¼Ä´æÆ÷ÖµÒÔ¼°ÄÚ´æÖµ¡£
+WindowsÆ½Ì¨ÏÂµÄHook²Ù×÷¿â£¬¿ÉÒÔ¿ç½ø³Ì¶ÁÈ¡Ä¿±ê½ø³ÌÔËÐÐ¹ý³ÌÖÐ´úÂë¶ÎÈÎÒâÎ»ÖÃµÄ¼Ä´æÆ÷ÖµÒÔ¼°ÄÚ´æÖµ£¬»ò¸Ä±äÄ¿±ê½ø³ÌµÄ´úÂëÂß¼­¡£
 
 ### ¹¤×÷Ô­Àí
 
@@ -8,14 +8,13 @@ iHookµÄÊµÏÖÔ­ÀíÎªinline hook£¬ÍøÉÏÓÐºÜ¶à½éÉÜ£¬¾ÍÊÇ½«HookµãÌæ»»³ÉÒ»Ìõjmp»ã±àÓï¾ä£
 
 £¨Í¼Æ¬´ý²¹³ä£©
 
-iHookÖ»ÄÜÔÚ×ÔÉíÔËÐÐµÄ½ø³ÌÖÐÉèÖÃHook£¬Èç¹ûÐèÒª¿ç½ø³ÌÖ´ÐÐ£¬¿ÉÒÔ½«²Ù×÷½çÃæ·â×°³ÉÒ»¸ö¶¯Ì¬Á´½Ó¿â(dll)£¬È»ºóÔÙÍ¨¹ýÒ»¸öÈë¿Ú³ÌÐò£¬½«iHookÔ¶³Ì×¢Èëµ½Ä¿±ê½ø³Ì¡£
+iHookÖ»ÄÜÔÚ×ÔÉíÔËÐÐµÄ½ø³ÌÖÐÉèÖÃHook£¬Èç¹ûÐèÒª¿ç½ø³ÌÖ´ÐÐ£¬¿ÉÒÔ½«²Ù×÷½çÃæ·â×°³ÉÒ»¸ö¶¯Ì¬Á´½Ó¿â(dll)£¬È»ºóÔÙÍ¨¹ýÒ»¸öÈë¿Ú³ÌÐò£¬½«iHookÔ¶³Ì×¢Èëµ½Ä¿±ê½ø³Ì¡£(¼ûÊ¾ÀýÖÐµÄLuaHook)
 
 ### ´úÂë½á¹¹
 
 ¸ÃÏîÄ¿ÖÐ°üº¬Èý¸öÄ¿Â¼£¬·Ö±ðÊÇ£º
-- iHook £¬¾²Ì¬Á´½Ó¿â(iHook.lib)£¬HookºËÐÄ´úÂë£¬Ìá¹©Hook²Ù×÷½Ó¿Ú¡£
-- LuaHook  Hook¶¯Ì¬Á´½Ó¿â(LuaHook.dll)£¬»ùÓÚiHook.libµÄLua´úÂëHookÊ¾Àý´úÂë£¬ÓÃÀ´ÌáÈ¡Ä³ÓÎÏ·ÔËÐÐ¹ý³ÌÖÐÖ´ÐÐµÄLua´úÂë¡£
-- Launch£¬Èë¿Ú³ÌÐò(Launch.exe)£¬ÓÃÓÚÑ¡ÔñÒ»¸ö½ø³Ì£¬È»ºó½«LuaHook.dii×¢Èëµ½Ä¿±ê½ø³Ì¡£
+- iHook £¬HookºËÐÄ´úÂë£¬Ìá¹©Hook²Ù×÷½Ó¿Ú¡£
+- Samples£¬Ê¾Àý´úÂë
 
 ### ±àÒë°²×°
 
