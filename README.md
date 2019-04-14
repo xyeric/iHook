@@ -10,21 +10,90 @@ iHookµÄÊµÏÖÔ­ÀíÎªinline hook£¬ÍøÉÏÓĞºÜ¶à½éÉÜ£¬¾ÍÊÇ½«HookµãÌæ»»³ÉÒ»Ìõjmp»ã±àÓï¾ä£
 
 iHookÖ»ÄÜÔÚ×ÔÉíÔËĞĞµÄ½ø³ÌÖĞÉèÖÃHook£¬Èç¹ûĞèÒª¿ç½ø³ÌÖ´ĞĞ£¬¿ÉÒÔ½«²Ù×÷½çÃæ·â×°³ÉÒ»¸ö¶¯Ì¬Á´½Ó¿â(dll)£¬È»ºóÔÙÍ¨¹ıÒ»¸öÈë¿Ú³ÌĞò£¬½«iHookÔ¶³Ì×¢Èëµ½Ä¿±ê½ø³Ì¡£(¼ûÊ¾ÀıÖĞµÄLuaHook)
 
+
+### Ê¹ÓÃ³¡¾°
+
+### ¿ìËÙ¿ªÊ¼
+
+iHookÌá¹©ÁËÁ½ÖÖHookÄ£Ê½£¬Ò»ÖÖÊÇÄ¬ÈÏHookÄ£Ê½£¬ÁíÒ»ÖÖÊÇWin32 API HookÄ£Ê½¡£Ä¬ÈÏÄ£Ê½ÏÂ£¬¿ÉÒÔ¶ÔÄÚ´æÖĞÈÎÒâµØÖ·½øĞĞHook£¬²¢ÇÒ¿ÉÒÔÔÚ»Øµ÷ÖĞ¶ÁÈ¡³ÌĞòÖ´ĞĞµ½HookÎ»ÖÃÊ±µÄ¼Ä´æÆ÷£¬ÄÚ´æÊı¾İµÈµÈ£¬¹¦ÄÜ¸ü¼ÓÇ¿´ó£¬µ«µÃÊÖ¶¯ÕÒ³öĞèÒªHookµÄµØÖ·£»Win32 APIÄ£Ê½ÏÂ£¬¿ÉÒÔÕë¶ÔÖ¸¶¨µÄWin32 API½øĞĞHook£¬¿ÉÒÔÔÚ»Øµ÷ÖĞÎ±×°·µ»Ø½á¹û£¬»òÔÙ»Øµ÷ÖĞ×öÒ»Ğ©ÌØÊâµÄ´¦ÀíºóÔÙµ÷ÓÃÔ­À´µÄAPI¡£
+
+**Ä¬ÈÏÄ£Ê½:**
+```C++
+// Ä¬ÈÏÄ£Ê½ÏÂ£¬»Øµ÷º¯ÊıÀàĞÍ±ØĞëÎª£ºvoid __stdcall (*F)(IHOOK_STATE*, LPVOID);
+void __stdcall HookCallback(IHOOK_STATE* pHookState, LPVOID lpCallbackParam)
+{
+	MainDialog* dlg = (MainDialog*)lpCallbackParam;
+
+	dlg->m_szLuaString.Format(_T("eax: %d\r\n"), IHookReadEax(pHookState));
+	dlg->SendMessage(WM_UPDATEDATA, FALSE);
+}
+
+IHOOK_STATE hookState;
+IHookInitState(&hookState);
+
+IHookSetAddress(&hookState, LPVOID(dwHookAddress));
+IHookSetCallback(&hookState, LPVOID(LuaHookCallback));
+IHookSetCallbackParam(&hookState, LPVOID(this));
+
+IHookSetHook(&hookState);
+
+// ...
+IHookUnsetHook(&hookState);
+```
+
+**Win32APIÄ£Ê½:**
+```C++
+// ¶¨ÒåÄ¿±êAPIµÄÀàĞÍ£¬ÔÚ»Øµ÷ÖĞµ÷ÓÃÄ¿±êAPIÊ±ĞèÒªÓÃµ½
+typedef HWND (WINAPI *GET_FOREGROUND_WINDOW)();
+
+// Hook»Øµ÷º¯ÊıĞèÒªºÍÄ¿±êº¯Êı²ÎÊı¡¢·µ»ØÀàĞÍ±£³ÖÒ»ÖÂ£¬·ñÔò»á³ö´í
+HWND WINAPI FakeGetForegroundWindow()
+{
+	//return 0x1212da; // fake caller for special purpose
+
+	GET_FOREGROUND_WINDOW GetForegroundWindow = (GET_FOREGROUND_WINDOW)IHookGetAPIDelegate(NULL);
+	HWND ret = GetForegroundWindow();
+
+	IHookTrace(_T("GetForegroundWindow: 0x%x"), ret);
+
+	return ret;
+}
+
+IHOOK_STATE hookState;
+IHookInitState(&hookState);
+
+IHookSetType(&hookState, IHOOK_TYPE_WIN32_API);
+IHookSetModuleName(&hookState, _T("user32.dll"));
+IHookSetAPIName(&hookState, _T("GetForegroundWindow"));
+IHookSetCallback(&hookState, FakeGetForegroundWindow);
+
+IHookSetHook(&hookState);
+
+// ...
+IHookUnsetHook(&hookState);
+```
+
+### °²×°¹¹½¨
+
+#### ÏÂÔØ°²×°
+
+£¨´ı²¹³ä£©
+
+#### ÊÖ¶¯±àÒë
+
+##### ±àÒë»·¾³
+
+- ²Ù×÷ÏµÍ³£ºWindows x86(x64)
+- ±àÒë»·¾³£ºVisual Studio 2017
+- ±àÒëÄ¿±ê£ºWin32
+
 ### ´úÂë½á¹¹
 
 ¸ÃÏîÄ¿ÖĞ°üº¬Èı¸öÄ¿Â¼£¬·Ö±ğÊÇ£º
 - iHook £¬HookºËĞÄ´úÂë£¬Ìá¹©Hook²Ù×÷½Ó¿Ú¡£
 - Samples£¬Ê¾Àı´úÂë¡£
 
-### ±àÒë°²×°
-
-#### ±àÒë»·¾³
-
-- ²Ù×÷ÏµÍ³£ºWindows x86(x64)
-- ±àÒë»·¾³£ºVisual Studio 2017
-- ±àÒëÄ¿±ê£ºWin32
-
-##### Ò»¡¢ÏîÄ¿ÅäÖÃ
+##### ÏîÄ¿ÅäÖÃ
 
 ÓÉÓÚ´úÂëÌá½»µÄ¹ı³ÌÖĞ£¬ºöÂÔÁËÒ»Ğ©±È½ÏÖØµÄÅäÖÃÎÄ¼ş£¬ËùÒÔÖ±½Ó´ÓGithubÀ­ÏÂÀ´µÄÏîÄ¿ÅäÖÃÓë±¾µØµÄÅäÖÃÓĞËù²îÒì£¬Òò´ËÔÚ±àÒëÖ®Ç°ĞŞ¸ÄÒ»Ğ©ÏîÄ¿ÅäÖÃĞÅÏ¢£¬·ñÔò±àÒë¿ÉÄÜ³ö´í¡£
 
@@ -39,8 +108,3 @@ iHookÖ»ÄÜÔÚ×ÔÉíÔËĞĞµÄ½ø³ÌÖĞÉèÖÃHook£¬Èç¹ûĞèÒª¿ç½ø³ÌÖ´ĞĞ£¬¿ÉÒÔ½«²Ù×÷½çÃæ·â×°³ÉÒ»¸
 *3. ×Ö·û¼¯*
 
 Ä¬ÈÏÇé¿öÏÂ×Ö·û¼¯Îª¡°Unicode¡±£¬Èç±àÒë½á¹û³öÏÖÂÒÂë£¬¿ÉÒÔÔÚÏîÄ¿ÊôĞÔÖĞ¸ü¸Ä×Ö·û¼¯Îª¡°ASCII¡±¡£
-
-### Ê¹ÓÃËµÃ÷
-
-£¨´ı²¹³ä£©
-
