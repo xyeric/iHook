@@ -6,9 +6,11 @@
 #define MAX_BACKUP_CODE_SIZE 0x10
 
 typedef enum {
-	IHOOK_TYPE_DEFAULT = 0,
+	IHOOK_TYPE_INLINE = 0,
 	IHOOK_TYPE_WIN32_API = 1
 } IHOOK_TYPE;
+
+#define IHOOK_TYPE_DEFAULT IHOOK_TYPE_INLINE
 
 typedef struct {
 	DWORD edi;

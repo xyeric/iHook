@@ -645,13 +645,13 @@ DWORD IHookReadEdiAsString(IHOOK_STATE* pHookState, TCHAR* pszBuffer, DWORD dwBu
 
 VOID IHookTrace(const TCHAR* pszFormat, ...)
 {
-	TCHAR szMsg[MAX_PATH];
+	TCHAR szMsg[4096];
 	va_list argList;
 	va_start(argList, pszFormat);
 
 	_vstprintf_s(szMsg, pszFormat, argList);
 
-	TCHAR szMsgWithPrefix[MAX_PATH];
+	TCHAR szMsgWithPrefix[4096];
 	_stprintf_s(szMsgWithPrefix, _T("[IHook] %s"), szMsg);
 
 	::OutputDebugString(szMsgWithPrefix);
