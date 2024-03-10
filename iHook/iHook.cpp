@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "assert.h"
 #include "tchar.h"
 #include "udis86.h"
@@ -219,6 +220,7 @@ BOOL __IHookInitDelegate(IHOOK_STATE* pHookState)
 	BOOL bSuccess = ::WriteProcessMemory(pHookState->hProcess, LPVOID(dwHookStatePtrAddress), &lpHookStatePtr, sizeof(DWORD), &dwBytesWritten);
 	if (!bSuccess || dwBytesWritten != sizeof(DWORD)) {
 		IHookTrace(_T("write hook state pointer into hook delegate memory error!"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 	IHookTrace(_T("write hook state pointer into hook delegate memory success"));
@@ -229,6 +231,7 @@ BOOL __IHookInitDelegate(IHOOK_STATE* pHookState)
 	bSuccess = ::WriteProcessMemory(pHookState->hProcess, LPVOID(dwCallbackParamPtrAddress), LPVOID(&pHookState->lpCallbackParam), sizeof(DWORD), &dwBytesWritten);
 	if (!bSuccess || dwBytesWritten != sizeof(DWORD)) {
 		IHookTrace(_T("write callback param pointer into hook delegate memory error!"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 	IHookTrace(_T("write callback param pointer into hook delegate memory success!"));
@@ -239,6 +242,7 @@ BOOL __IHookInitDelegate(IHOOK_STATE* pHookState)
 	bSuccess = ::WriteProcessMemory(pHookState->hProcess, LPVOID(dwCallbackPtrAddress), LPVOID(&pHookState->lpCallbackAddress), sizeof(DWORD), &dwBytesWritten);
 	if (!bSuccess || dwBytesWritten != sizeof(DWORD)) {
 		IHookTrace(_T("write callback pointer into hook delegate memory error!"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 	IHookTrace(_T("write callback pointer into hook delegate memory success!"));
@@ -257,6 +261,7 @@ BOOL __IHookInitDelegate(IHOOK_STATE* pHookState)
 	bSuccess = ::WriteProcessMemory(pHookState->hProcess, LPVOID(dwBackupCodeAddress), LPVOID(byteBackupCode), pHookState->dwBackupCodeSize, &dwBytesWritten);
 	if (!bSuccess || dwBytesWritten != pHookState->dwBackupCodeSize) {
 		IHookTrace(_T("write backup code into hook delegate memory error!"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 	IHookTrace(_T("write backup code into hook delegate memory success!"));
@@ -274,6 +279,7 @@ BOOL __IHookInitDelegate(IHOOK_STATE* pHookState)
 	bSuccess = ::WriteProcessMemory(pHookState->hProcess, LPVOID(dwReturnCodeAddress), LPVOID(bRetCode), 5, &dwBytesWritten);
 	if (!bSuccess || dwBytesWritten != 5) {
 		IHookTrace(_T("write return code into hook delegate memory error!"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 	IHookTrace(_T("write return code into hook delegate memory success!"));
@@ -356,6 +362,7 @@ BOOL __IHookInitAPIDelegate(IHOOK_STATE* pHookState)
 	BOOL bSuccess = ::WriteProcessMemory(pHookState->hProcess, LPVOID(dwBackupCodeAddress), LPVOID(byteBackupCode), pHookState->dwBackupCodeSize, &dwBytesWritten);
 	if (!bSuccess || dwBytesWritten != pHookState->dwBackupCodeSize) {
 		IHookTrace(_T("write backup code into hook delegate memory error!"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 	IHookTrace(_T("write backup code into hook delegate memory success!"));
@@ -373,6 +380,7 @@ BOOL __IHookInitAPIDelegate(IHOOK_STATE* pHookState)
 	bSuccess = ::WriteProcessMemory(pHookState->hProcess, LPVOID(dwReturnCodeAddress), LPVOID(bRetCode), 5, &dwBytesWritten);
 	if (!bSuccess || dwBytesWritten != 5) {
 		IHookTrace(_T("write return code into hook delegate memory error!"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 	IHookTrace(_T("write return code into hook delegate memory success!"));
@@ -409,7 +417,10 @@ BOOL IHookSetHook(IHOOK_STATE* pHookState)
 
 	if (pHookState->type == IHOOK_TYPE_WIN32_API) {
 		HMODULE hModule = ::GetModuleHandle(pHookState->szModuleName);
-		if (hModule == NULL) return FALSE;
+		if (hModule == NULL) {
+			::LeaveCriticalSection(&g_cs);
+			return FALSE;
+		}
 
 		pHookState->lpHookAddress = ::GetProcAddress(hModule, pHookState->szAPIName);
 
@@ -423,11 +434,13 @@ BOOL IHookSetHook(IHOOK_STATE* pHookState)
 
 	if (!__IHookBackupHookedCode(pHookState)) {
 		IHookTrace(_T("backup hooked code error"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 
 	if (!__IHookInitHookDelegate(pHookState)) {
 		IHookTrace(_T("init hook delegate error"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 
@@ -455,6 +468,7 @@ BOOL IHookSetHook(IHOOK_STATE* pHookState)
 	BOOL bSuccess = ::WriteProcessMemory(pHookState->hProcess, LPVOID(pHookState->lpHookAddress), LPVOID(byHookCode), pHookState->dwBackupCodeSize, &dwBytesWritten);
 	if (!bSuccess || dwBytesWritten != pHookState->dwBackupCodeSize) {
 		IHookTrace(_T("write jmp code into hook address memory error!"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 
@@ -491,6 +505,7 @@ BOOL IHookUnsetHook(IHOOK_STATE* pHookState)
 	BOOL bSuccess = ::WriteProcessMemory(hProcess, LPVOID(pHookState->lpHookAddress), LPVOID(pHookState->byteBackupCode), pHookState->dwBackupCodeSize, &dwBytesWritten);
 	if (!bSuccess || dwBytesWritten != pHookState->dwBackupCodeSize) {
 		IHookTrace(_T("write hook address memory error!"));
+		::LeaveCriticalSection(&g_cs);
 		return FALSE;
 	}
 

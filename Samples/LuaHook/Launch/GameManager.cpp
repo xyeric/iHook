@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "Game.h"
+#include "GameManager.h"
 
-Game::Game(HWND hWnd)
+CGameManager::CGameManager(HWND hWnd)
 {
 	m_hWnd = hWnd;
 
@@ -11,7 +11,7 @@ Game::Game(HWND hWnd)
 }
 
 
-Game::~Game()
+CGameManager::~CGameManager()
 {
 }
 
@@ -19,7 +19,7 @@ Game::~Game()
 BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam)
 {
 	GameHWndList* pGameHWndList = (GameHWndList*)lParam;
-	if (GetParent(hWnd) == NULL && IsWindowVisible(hWnd) && pGameHWndList->m_length < MAX_GAMES_QUEUE) {
+	if (GetParent(hWnd) == NULL && IsWindowVisible(hWnd) && pGameHWndList->m_length < MAX_GAME_COUNT) {
 		TCHAR szClassName[MAX_PATH];
 		::GetClassName(hWnd, szClassName, MAX_PATH);
 
@@ -31,34 +31,34 @@ BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam)
 	return TRUE;
 }
 
-DWORD Game::FindGames(Game** games, DWORD maxCount) {
+DWORD CGameManager::FindGames(CGameManager** pGameManagers, DWORD maxCount) {
 	GameHWndList gameHWndList = { 0 };
 	::EnumWindows(EnumWindowsProc, (LPARAM)&gameHWndList);
 
 	DWORD gameCount = gameHWndList.m_length;
 	for (DWORD i = 0; i < gameCount; i++) {
-		games[i] = new Game(gameHWndList.m_list[i]);
+		pGameManagers[i] = new CGameManager(gameHWndList.m_list[i]);
 	}
 
 	return gameCount;
 }
 
-DWORD Game::GetProcessId() const
+DWORD CGameManager::GetProcessId() const
 {
 	return m_pid;
 }
 
-TCHAR* Game::GetWindowText() const
+TCHAR* CGameManager::GetWindowText() const
 {
 	return (TCHAR*)m_szWndText;
 }
 
-HWND Game::GetHwnd() const
+HWND CGameManager::GetHwnd() const
 {
 	return m_hWnd;
 }
 
-HANDLE Game::OpenProcess()
+HANDLE CGameManager::OpenProcess()
 {
 	if (m_hProc == NULL) {
 		m_hProc = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, m_pid);
@@ -67,7 +67,7 @@ HANDLE Game::OpenProcess()
 	return m_hProc;
 }
 
-BOOL Game::CloseProcess()
+BOOL CGameManager::CloseProcess()
 {
 	if (m_hProc != NULL) {
 		::CloseHandle(m_hProc);
@@ -78,7 +78,7 @@ BOOL Game::CloseProcess()
 }
 
 
-HMODULE Game::LoadLibrary(TCHAR* szDllPath)
+HMODULE CGameManager::LoadLibrary(TCHAR* szDllPath)
 {
 	HANDLE hProc = m_hProc;
 	if (hProc == NULL) {
@@ -86,7 +86,7 @@ HMODULE Game::LoadLibrary(TCHAR* szDllPath)
 	}
 
 	if (hProc == NULL) {
-		Game::Trace(_T("cannot open game process"));
+		CGameManager::Trace(_T("cannot open game process"));
 		this->CloseProcess();
 		return FALSE;
 	}
@@ -95,7 +95,7 @@ HMODULE Game::LoadLibrary(TCHAR* szDllPath)
 
 	LPVOID lpAddr = ::VirtualAllocEx(hProc, NULL, dwBufSize, MEM_COMMIT, PAGE_READWRITE);
 	if (lpAddr == NULL) {
-		Game::Trace(_T("cannot alloc remote memery for dll path"));
+		CGameManager::Trace(_T("cannot alloc remote memery for dll path"));
 		this->CloseProcess();
 		return NULL;
 	}
@@ -103,7 +103,7 @@ HMODULE Game::LoadLibrary(TCHAR* szDllPath)
 	SIZE_T lwriteSize;
 	BOOL ret = ::WriteProcessMemory(hProc, lpAddr, szDllPath, dwBufSize, &lwriteSize);
 	if (!ret || lwriteSize != dwBufSize) {
-		Game::Trace(_T("write dll path into remote memery failed"));
+		CGameManager::Trace(_T("write dll path into remote memery failed"));
 		this->CloseProcess();
 		return NULL;
 	}
@@ -116,12 +116,12 @@ HMODULE Game::LoadLibrary(TCHAR* szDllPath)
 	HMODULE hDll;
 	::GetExitCodeThread(hThrd, (LPDWORD)&hDll);
 	if (hDll == NULL) {
-		Game::Trace(_T("cannot get dll module handle"));
+		CGameManager::Trace(_T("cannot get dll module handle"));
 	}
 
 	ret = ::VirtualFreeEx(hProc, lpAddr, dwBufSize, MEM_DECOMMIT);
 	if (!ret) {
-		Game::Trace(_T("cannot free remote memery"));
+		CGameManager::Trace(_T("cannot free remote memery"));
 	}
 
 	::CloseHandle(hThrd);
@@ -130,7 +130,7 @@ HMODULE Game::LoadLibrary(TCHAR* szDllPath)
 	return hDll;
 }
 
-BOOL Game::UnLoadLibrary(TCHAR* szDllPath)
+BOOL CGameManager::UnLoadLibrary(TCHAR* szDllPath)
 {
 	HANDLE hProc = m_hProc;
 	if (hProc == NULL) {
@@ -138,7 +138,7 @@ BOOL Game::UnLoadLibrary(TCHAR* szDllPath)
 	}
 
 	if (hProc == NULL) {
-		Game::Trace(_T("cannot open game process"));
+		CGameManager::Trace(_T("cannot open game process"));
 		this->CloseProcess();
 		return FALSE;
 	}
@@ -147,7 +147,7 @@ BOOL Game::UnLoadLibrary(TCHAR* szDllPath)
 
 	LPVOID lpAddr = ::VirtualAllocEx(hProc, NULL, dwBufSize, MEM_COMMIT, PAGE_READWRITE);
 	if (lpAddr == NULL) {
-		Game::Trace(_T("cannot alloc remote memery for dll path"));
+		CGameManager::Trace(_T("cannot alloc remote memery for dll path"));
 		this->CloseProcess();
 		return FALSE;
 	}
@@ -155,7 +155,7 @@ BOOL Game::UnLoadLibrary(TCHAR* szDllPath)
 	SIZE_T lwriteSize;
 	BOOL ret = ::WriteProcessMemory(hProc, lpAddr, szDllPath, dwBufSize, &lwriteSize);
 	if (!ret || lwriteSize != dwBufSize) {
-		Game::Trace(_T("write dll path into remote memery failed"));
+		CGameManager::Trace(_T("write dll path into remote memery failed"));
 		this->CloseProcess();
 		return FALSE;
 	}
@@ -168,14 +168,14 @@ BOOL Game::UnLoadLibrary(TCHAR* szDllPath)
 	HMODULE hDll;
 	::GetExitCodeThread(hThrd, (LPDWORD)&hDll);
 	if (hDll == NULL) {
-		Game::Trace(_T("cannot get dll module handle"));
+		CGameManager::Trace(_T("cannot get dll module handle"));
 		this->CloseProcess();
 		return FALSE;
 	}
 
 	ret = ::VirtualFreeEx(hProc, lpAddr, dwBufSize, MEM_DECOMMIT);
 	if (!ret) {
-		Game::Trace(_T("cannot free remote memery"));
+		CGameManager::Trace(_T("cannot free remote memery"));
 	}
 
 	::CloseHandle(hThrd);
@@ -190,7 +190,7 @@ BOOL Game::UnLoadLibrary(TCHAR* szDllPath)
 	return TRUE;
 }
 
-VOID Game::Trace(TCHAR* pszFormat, ...)
+VOID CGameManager::Trace(TCHAR* pszFormat, ...)
 {
 	TCHAR szMsg[MAX_PATH];
 	va_list argList;
