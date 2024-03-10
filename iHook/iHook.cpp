@@ -588,6 +588,7 @@ DWORD IHookReadEaxAsString(IHOOK_STATE* pHookState, TCHAR* pszBuffer, DWORD dwBu
 
 	return IHookReadString(lpAddress, pszBuffer, dwBufferSize);
 }
+
 DWORD IHookReadEbxAsString(IHOOK_STATE* pHookState, TCHAR* pszBuffer, DWORD dwBufferSize)
 {
 	LPVOID lpAddress = NULL;
